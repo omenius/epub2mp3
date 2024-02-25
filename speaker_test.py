@@ -8,7 +8,7 @@ text = "Every author, I suppose, has in mind a setting in which readers of his o
 for speaker in speakers:
     tts.tts_to_file(
         text=text,
-        file_path="speaker_samples_long/"+speaker+".wav",
+        file_path="speaker_samples/"+speaker+".wav",
         speaker=speaker,
         language="en",
         split_sentences=True
