@@ -53,7 +53,6 @@ def brain(brainPipe, stopPipe, mouthPipe):
                     overlap_wav_len = 1024,
                     stream_chunk_size=20,
                     repetition_penalty=5.0,
-                    temperature=0.75
                 )
 
                 for i, chunk in enumerate(chunks):

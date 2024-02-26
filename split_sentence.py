@@ -20,6 +20,7 @@ def split_sentence(text, language):
                 text_splits[-1] += " " + str(sentence)
                 text_splits[-1] = text_splits[-1].lstrip()
             elif len(str(sentence)) > hard_limit:
+                print('hard limit broken: \n'+sentence)
                 # if the current sentence is greater than the hard_limit
                 for line in textwrap.wrap(
                     str(sentence),
