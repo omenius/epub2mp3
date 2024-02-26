@@ -105,12 +105,12 @@ def main():
 
         # Generate audio
         wavs = []
-        wavs.append(get_pause(1))
+        wavs.append(get_pause(1)) # pause before chapter
         for text in texts:
             if text.isspace(): continue
             wavs.append(get_speech(text))
-            wavs.append(get_pause(1))
-        wavs.append(get_pause(2))
+            wavs.append(get_pause(0.5)) # pause after paragraph
+        wavs.append(get_pause(2)) # pause after chapter
         wav = np.concatenate(wavs)
 
         # Save to wav

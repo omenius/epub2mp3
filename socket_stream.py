@@ -10,7 +10,7 @@ speed = 1.17 # 1.0-2.0
 def brain(brainPipe, stopPipe, mouthPipe):
     # Load TTS model
     print('--- Loading model...')
-    import re
+    # import re
     import pysbd
     from TTS.tts.configs.xtts_config import XttsConfig
     from TTS.tts.models.xtts import Xtts
@@ -40,7 +40,6 @@ def brain(brainPipe, stopPipe, mouthPipe):
 
         try:
             for sentence in sentences:
-                # this is stupid but it works. Source: coqui/xtts/blob/main/app.py
                 # sentence = re.sub("([^\x00-\x7F]|\w)(\.|\。|\?)",r"\1 \2\2", sentence)
 
                 chunks = model.inference_stream(
