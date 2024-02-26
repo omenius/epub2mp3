@@ -3,3 +3,4 @@ tts/xtts/
 venv/
 input/
 female.wav
+__pycache__/
