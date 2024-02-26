@@ -88,9 +88,27 @@ def get_speech(text):
         except:
             print('error with sentence: ' + sentence)
             raise
-
-        wavs.append(get_pause(0.6))
+        wavs.append(get_pause(0.6)) # pause after sentence
+    wavs.append(get_pause(0.6)) # pause after paragraph
     return np.concatenate(wavs)
+
+# Add metadata to mp3 file
+def tag_mp3(file_path, track_num, title):
+    mp3 = eyed3.load(file_path)
+    mp3.initTag()
+    mp3.tag.track_num = track_num
+    mp3.tag.title = title
+    mp3.tag.album = BOOK_NAME
+    mp3.tag.artist = AUTHOR or 'Unknown'
+    mp3.tag.release_date = eyed3.core.Date(YEAR or 1970)
+    if COVER:
+        mp3.tag.images.set(
+            type_=3,
+            img_data=COVER.content,
+            mime_type=COVER.media_type,
+            description='Cover image'
+        )
+    mp3.tag.save()
 
 # === Main function ==========================================================
 def main():
@@ -107,9 +125,7 @@ def main():
         wavs = []
         wavs.append(get_pause(1)) # pause before chapter
         for text in texts:
-            if text.isspace(): continue
             wavs.append(get_speech(text))
-            wavs.append(get_pause(0.5)) # pause after paragraph
         wavs.append(get_pause(2)) # pause after chapter
         wav = np.concatenate(wavs)
 
@@ -119,27 +135,12 @@ def main():
             continue
 
         # Convert to mp3 and save
+        file_path += '.mp3'
         memoryBuff = BytesIO()
         write(memoryBuff, 24000, wav)
-        AudioSegment.from_wav(memoryBuff).export(file_path+'.mp3', format='mp3', bitrate=ARGS.bitrate)
+        AudioSegment.from_wav(memoryBuff).export(file_path, format='mp3', bitrate=ARGS.bitrate)
         memoryBuff.close()
-
-        # Write mp3 metadata
-        mp3 = eyed3.load(file_path+'.mp3')
-        mp3.initTag()
-        mp3.tag.track_num = index+1
-        mp3.tag.title = title
-        mp3.tag.album = BOOK_NAME
-        mp3.tag.artist = AUTHOR or 'Unknown'
-        mp3.tag.release_date = eyed3.core.Date(YEAR or 1970)
-        if COVER:
-            mp3.tag.images.set(
-                type_=3,
-                img_data=COVER.content,
-                mime_type=COVER.media_type,
-                description='Cover image'
-            )
-        mp3.tag.save()
+        tag_mp3(file_path, index+1, title)
 
     print('Job finished.')
 

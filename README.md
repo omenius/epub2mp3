@@ -1,4 +1,9 @@
 # epub2mp3
+```
+ ┌┐┌┐╷╷├┐┌┐──────┐
+ ├┘├┘└┘└┘┌┘┌┬┐┌┐─┤
+ └─╵─────└─╵╵╵├┘─┘
+```
 
 ## do the needful
 ```bash
@@ -6,10 +11,6 @@ python -m venv venv
 source venv/bin/activate
 pip install TTS sounddevice eyed3 EbookLib beautifulsoup4 pydub
 ```
-## socket_stream.py
-Works with UNIX only. Listens to /tmp/say_socket and streams audio to sound device almost instantly.
-
-Send text to socket using ```python send_socket.py "hello"``` or preferably with something like socat or netcat.
 
 ## epub2mp3.py
 Convert epub e-books into mp3 audiobooks.
@@ -40,3 +41,8 @@ options:
   -w, --wav             generate a non compressed wav file (default: False)
   -v, --verbose         increase output verbosity (default: False)
 ```
+
+## socket_stream.py
+Works with UNIX only. Listens to /tmp/say_socket and streams audio to sound device almost instantly.
+
+Send text to socket using ```python send_socket.py "hello"``` or preferably with something like socat or netcat.
