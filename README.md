@@ -11,8 +11,8 @@ Works with UNIX only. Listens to /tmp/say_socket and streams audio to sound devi
 
 Send text to socket using ```python send_socket.py "hello"``` or preferably with something like socat or netcat.
 
-## epub2mp3.py --help
-Converts epub e-book files to mp3 audiobook files.
+## epub2mp3.py
+Convert epub e-books into mp3 audiobooks.
 ```
 usage: epub2mp3.py [-h] [-i IGNORE [IGNORE ...]] [-f FILTER] [-d DIR] [-s SPEED] [-n NAME]
                    [-l LANG] [-b BITRATE] [-w] [-v]
