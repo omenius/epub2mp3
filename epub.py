@@ -59,7 +59,7 @@ def extract(file, ignore_chapters=[], class_filter=[]):
     except: author = None
 
     # try: year = int(book.metadata['http://purl.org/dc/elements/1.1/']['date'][0][0][0:4])
-    try: year = book.get_metadata('DC', 'date')[0][0]
+    try: year = int(book.get_metadata('DC', 'date')[0][0])
     except: year = None
 
     try: title = book.get_metadata('DC', 'title')[0][0]
