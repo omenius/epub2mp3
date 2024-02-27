@@ -43,6 +43,11 @@ options:
 ```
 
 ## socket_stream.py
-Works with UNIX only. Listens to /tmp/say_socket and streams audio to sound device almost instantly.
+Listens to /tmp/say_socket for text and streams speech to sound device almost instantly. Works with UNIX only.
 
-Send text to socket using ```python send_socket.py "hello"``` or preferably with something like socat or netcat.
+This is not a part of epub2mp3 program, but a standalone service. Send text to socket using ```python send_socket.py "hello"``` or preferably with something like socat or netcat. You can for example pipe your text selection to the speech service. Using i3 wm, you could do it like this:
+```bash
+bindsym $mod+y exec xsel | socat -u - UNIX-CONNECT:/tmp/say_socket
+bindsym $mod+Shift+y exec echo -n "!Stop" | socat -u - UNIX-CONNECT:/tmp/say_socket
+bindsym $mod+u exec echo -n "!Pause" | socat -u - UNIX-CONNECT:/tmp/say_socket
+```
