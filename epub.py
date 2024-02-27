@@ -54,11 +54,16 @@ def extract(file, ignore_chapters=[], class_filter=[]):
     images = book.get_items_of_type(ebooklib.ITEM_IMAGE)
     cover = next((x for x in images if 'cover' in x.file_name), None)
 
-    try: author = book.metadata['http://purl.org/dc/elements/1.1/']['creator'][0][0]
+    # try: author = book.metadata['http://purl.org/dc/elements/1.1/']['creator'][0][0]
+    try: author = book.get_metadata('DC', 'creator')[0][0]
     except: author = None
 
-    try: year = int(book.metadata['http://purl.org/dc/elements/1.1/']['date'][0][0][0:4])
+    # try: year = int(book.metadata['http://purl.org/dc/elements/1.1/']['date'][0][0][0:4])
+    try: year = book.get_metadata('DC', 'date')[0][0]
     except: year = None
+
+    try: title = book.get_metadata('DC', 'title')[0][0]
+    except: title = book.title
 
     started = False
     content = []
@@ -80,4 +85,4 @@ def extract(file, ignore_chapters=[], class_filter=[]):
 
     global UID
     UID = 0
-    return (author, book.title, year, cover, content)
+    return (author, title, year, cover, content)

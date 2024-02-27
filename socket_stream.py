@@ -105,8 +105,7 @@ brain_process = Process(target=brain, args=(brainPipe, stopPipe, mouthPipe))
 brain_process.start()
 
 # Remove the socket if exists
-try:
-    os.unlink(socket_path)
+try: os.unlink(socket_path)
 except OSError:
     if os.path.exists(socket_path):
         raise
@@ -124,21 +123,16 @@ try:
         data = connection.recv(64768)
         connection.close()
 
-        if not data:
-            print('!!! NO DATA/EMPTY BINARY ???')
-            continue
+        if not data: continue
 
         msg = data.decode()
+        if msg.isspace(): continue
 
-        if msg.isspace():
-            continue
-
-        if msg == '!Stop':
+        if msg == '!Stop!':
             print('--- Stop called')
-            if not stopPipe[1].poll():
-                stopPipe[0].send(1)
-                while mouthPipe[1].poll():
-                    mouthPipe[1].recv()
+            if stopPipe[1].poll(): continue
+            stopPipe[0].send(1)
+            while mouthPipe[1].poll(): mouthPipe[1].recv()
             continue
 
         if msg == '!Pause':
@@ -148,12 +142,10 @@ try:
         print(msg)
 
         # clear stop signals if exists
-        while stopPipe[1].poll():
-            stopPipe[1].recv()
+        while stopPipe[1].poll(): stopPipe[1].recv()
 
         brainPipe[0].send(msg)
         
-
 except:
     connection.close()
     os.unlink(socket_path)
