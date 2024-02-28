@@ -2,5 +2,5 @@ tts/vits/
 tts/xtts/
 venv/
 input/
-female.wav
+stream/female.wav
 __pycache__/

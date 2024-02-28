@@ -47,6 +47,11 @@ import sys
 from os import path, mkdir
 import argparse as ap
 process_arguments()
+from TTS.tts.configs.xtts_config import XttsConfig
+from TTS.tts.models.xtts import Xtts
+from TTS.utils.manage import ModelManager
+from TTS.utils.generic_utils import get_user_data_dir
+from torch import cuda
 import numpy as np
 from scipy.io.wavfile import write
 from split_sentence import split_sentence
@@ -58,11 +63,7 @@ if not ARGS.wav:
 # load XTTS text-to-speech model and speaker latents
 def load_model():
     global MODEL, GPT_COND_LATENT, SPEAKER_EMBEDDING
-    from TTS.tts.configs.xtts_config import XttsConfig
-    from TTS.tts.models.xtts import Xtts
-    from TTS.utils.manage import ModelManager
-    from TTS.utils.generic_utils import get_user_data_dir
-    from torch import cuda
+
     model_name = 'tts_models/multilingual/multi-dataset/xtts_v2'
     ModelManager().download_model(model_name)
     model_path = path.join(get_user_data_dir('tts'), model_name.replace('/','--'))
@@ -144,7 +145,7 @@ def main():
         wavs = []
         wavs.append(get_pause(1)) # pause before chapter
         for t in texts: wavs.append(get_speech(t))
-        wavs.append(get_pause(2)) # pause after chapter
+        wavs.append(get_pause(1)) # pause after chapter
         wav = np.concatenate(wavs)
 
         # Save to wav

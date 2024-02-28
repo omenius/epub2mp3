@@ -14,6 +14,7 @@ pip install TTS sounddevice eyed3 EbookLib beautifulsoup4 pydub
 
 ## epub2mp3.py
 Convert epub e-books into mp3 audiobooks.
+For example:```python epub2mp3.py /mnt/warez/isaif.epub -d ~/Audiobooks```
 ```
 usage: epub2mp3.py [-h] [-i IGNORE [IGNORE ...]] [-f FILTER] [-d DIR] [-s SPEED] [-n NAME]
                    [-l LANG] [-b BITRATE] [-w] [-v]
@@ -42,10 +43,10 @@ options:
   -v, --verbose         increase output verbosity (default: False)
 ```
 
-## socket_stream.py
-Listens to /tmp/say_socket for text and streams speech to sound device almost instantly. Works with UNIX only.
+## stream/socket_service.py
+Listens to /tmp/say_socket for text and streams it as speech to sound device almost instantly. Works with UNIX only.
 
-This is not a part of epub2mp3 program, but a standalone service. Send text to socket using ```python send_socket.py "hello"``` or preferably with something like socat or netcat. You can for example pipe your text selection to the speech service. Using i3 wm, you could do it like this:
+This is not a part of epub2mp3 program, but a standalone service. Send text to socket using ```python send_socket.py "hello"``` or preferably with something like socat or netcat. You can for example makea a shortcut that pipes your text selection to the speech service. Using i3 wm, you could do it like this:
 ```bash
 bindsym $mod+y exec xsel | socat -u - UNIX-CONNECT:/tmp/say_socket
 bindsym $mod+Shift+y exec echo -n "!Stop" | socat -u - UNIX-CONNECT:/tmp/say_socket
