@@ -14,7 +14,8 @@ pip install TTS sounddevice eyed3 EbookLib beautifulsoup4 pydub
 
 ## epub2mp3.py
 Convert epub e-books into mp3 audiobooks.
-For example:```python epub2mp3.py /mnt/warez/isaif.epub -d ~/Audiobooks```
+
+For example: ```python epub2mp3.py /mnt/warez/isaif.epub -d ~/Audiobooks```
 ```
 usage: epub2mp3.py [-h] [-i IGNORE [IGNORE ...]] [-f FILTER] [-d DIR] [-s SPEED] [-n NAME]
                    [-l LANG] [-b BITRATE] [-w] [-v]
