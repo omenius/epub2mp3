@@ -1,7 +1,6 @@
-# Modules are heavy, so we don't do imports unless arguments are fine
-def process_arguments():
-    global ARGS
+# Modules are heavy, so we don't do imports unless arguments are good
 
+def process_arguments():
     motd = 'Convert epub e-books into mp3 audiobooks.'
     i_default = ['contents', 'copyright', 'bibliography']
     arg_parser = ap.ArgumentParser(description=motd, formatter_class=ap.ArgumentDefaultsHelpFormatter)
@@ -11,9 +10,12 @@ def process_arguments():
     a('-n','--name',    default='Royston Min', help='name of the speaker',  type=str)
     a('-l','--lang',    default='en',       help='speaker language code',   type=str.lower)
     a('-b','--bitrate', default='160k',     help='output bit rate: 8k-160k',type=str.lower)
-    a('-s','--speed',   default=1.18,       help='speaker speed: 0.0-2.0',  type=float)
+    a('-s','--speed',   default=1.19,       help='speaker speed: 0.0-2.0',  type=float)
     a('-i','--ignore',  default=i_default,  help='ignore given chapter(s)', type=str.lower, nargs='+')
-    a('-f','--filter',  default='footnote', help='remove elements with matching class name(s)', type=str.lower)
+    a('-f','--filter',  default='footnote', help='remove elements with matching class name', type=str.lower)
+    a('-S','--start',   default=None,       help='Chapter to start from',   type=str.lower)
+    a('-E','--end',     default=None,       help='End to this chapter',       type=str.lower)
+    a('-r','--rm-links',action='store_true', help='remove html <a> elements')
     a('-w','--wav',     action='store_true', help='generate a non compressed wav file')
     a('-v','--verbose', action='store_true', help='increase output verbosity')
     args = arg_parser.parse_args()
@@ -34,7 +36,7 @@ def process_arguments():
     return args
 
 def load_book():
-    try: book = extract(ARGS.file, ignore_chapters=ARGS.ignore, class_filter=ARGS.filter)
+    try: book = extract(ARGS.file, ARGS.ignore, ARGS.filter, ARGS.start, ARGS.end, ARGS.rm_links)
     except:
         if ARGS.verbose: raise
         sys.exit('Could not open the given epub file. Use -v flag to see the error.')
@@ -46,7 +48,6 @@ import argparse as ap
 ARGS = process_arguments()
 from epub import extract
 AUTHOR, BOOK_NAME, YEAR, COVER, BOOK = load_book()
-MODEL = None
 from TTS.tts.configs.xtts_config import XttsConfig
 from TTS.tts.models.xtts import Xtts
 from TTS.utils.manage import ModelManager
@@ -62,6 +63,8 @@ if not ARGS.wav:
 
 # load XTTS text-to-speech model and speaker latents
 def load_model():
+    global MODEL
+
     model_name = 'tts_models/multilingual/multi-dataset/xtts_v2'
     ModelManager().download_model(model_name)
     model_path = path.join(get_user_data_dir('tts'), model_name.replace('/','--'))
@@ -80,7 +83,6 @@ def load_model():
         ARGS.name = input('\n\nEnter a valid name: ')
     latent, speaker = model.speaker_manager.speakers[ARGS.name].values()
 
-    global MODEL
     MODEL = {
         'model': model,
         'gpt_cond_latent': latent,
@@ -130,9 +132,9 @@ def get_speech(text):
         except: print('error with sentence:\n', sentence); raise
 
         wavs.append(speech['wav'])
-        wavs.append(get_pause(0.6)) # pause after sentence
+        wavs.append(get_pause(0.5)) # pause after sentence
 
-    wavs.append(get_pause(0.6)) # pause after paragraph
+    wavs.append(get_pause(0.4)) # pause after paragraph
     return np.concatenate(wavs)
 
 # === Main function ==============================================
@@ -145,14 +147,13 @@ def main():
         except:
             if ARGS.verbose: raise
             sys.exit(f'Cant create a direcotry in "{ARGS.dir}". Use -v flag to see the error.')
-    else: print('Output directory  already exists. Continuing a previous job.')
+    else: print('Output directory already exists. Continuing a previous job.')
 
     for index, (title, texts) in enumerate(BOOK):
-        file_path = path.join(ARGS.dir, BOOK_NAME, title)
+        file_path = path.join(ARGS.dir, BOOK_NAME, title) + (ARGS.wav and '.wav' or '.mp3')
 
         # Skip chapter if file exists
-        if ARGS.wav and path.exists(file_path+'.wav'): continue
-        if path.exists(file_path+'.mp3'): continue
+        if path.exists(file_path): continue
 
         # Generate audio
         print(f'Converting chapter {index+1} of {len(BOOK)}: {title}')
@@ -164,11 +165,10 @@ def main():
 
         # Save to wav
         if ARGS.wav:
-            write(file_path+'.wav', 24000, wav)
+            write(file_path, 24000, wav)
             continue
 
         # Convert to mp3 and save
-        file_path += '.mp3'
         memoryBuff = BytesIO()
         write(memoryBuff, 24000, wav)
         AudioSegment.from_wav(memoryBuff).export(
