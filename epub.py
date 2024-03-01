@@ -1,6 +1,7 @@
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
+import re
 
 def flatten(item, result=[]):
     for t in item:
@@ -36,13 +37,22 @@ def get_texts(doc, class_filter=[], remove_links=False):
                         return True
         return False
 
-    body = doc.get_body_content()
-    body = body.replace(b'</p>', b'</p>\n')
+    body = doc.get_body_content().decode('utf-8')
+
+    # # remove newlines in paragraphs
+    rx = re.compile(r'(<p>(?!.*<\/p>).*)\n')
+    while rx.search(body):
+        body = rx.sub(r'\1 ', body)
+
+    body = body.replace('</p>', '</p>\n') # add \n after paragraphs
+
     soup = BeautifulSoup(body, 'html.parser')
     for d in soup.find_all(custom_selector): recurs_del(d) # remove custom_selector items
+
     texts = soup.get_text().strip()
-    texts = texts.split('\n')
+    texts = texts.replace('\r', '').split('\n') # remove \r, organize by \n
     texts = list(filter(str.strip, texts)) # remove empty and whitespace items
+
     return texts
 
 def extract(file, ignore_chapters=[], class_filter=[], start_chapter=None, end_chapter=None, remove_links=False):
