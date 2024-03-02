@@ -1,7 +1,6 @@
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
-import re
 
 def flatten(item, result=[]):
     for t in item:
@@ -27,9 +26,10 @@ def get_texts(doc, class_filter=[], remove_links=False):
         if p and (p.text.isspace() or not p.text):
             recurs_del(p)
 
-    # removes anything with remove[n] in class name
+    # select elements for removal
     def custom_selector(tag):
-        if remove_links and tag.name == 'a': return True
+        if remove_links and tag.name == 'a':
+            return True
         if tag.has_attr('class'):
             for c in tag.get('class'):
                 for f in class_filter.split(' '):
@@ -39,16 +39,22 @@ def get_texts(doc, class_filter=[], remove_links=False):
 
     body = doc.get_body_content().decode('utf-8')
 
-    # # remove newlines in paragraphs
-    rx = re.compile(r'(<p>(?!.*<\/p>).*)\n')
-    while rx.search(body):
-        body = rx.sub(r'\1 ', body)
+    body = body.replace('\n', '')
+    splitters = ['div','p','h1','h2','h3','h4','h5','h6','blockquote','li','dt','dd']
+    for s in splitters:
+        tag ='</'+s+'>' 
+        body = body.replace(tag, tag + '\n')
 
-    body = body.replace('</p>', '</p>\n') # add \n after paragraphs
+    # import re
+    # # # remove newlines in paragraphs
+    # rx = re.compile(r'(<p>(?!.*<\/p>).*)\n')
+    # while rx.search(body):
+    #     body = rx.sub(r'\1 ', body)
+
+    # body = body.replace('</p>', '</p>\n') # add \n after paragraphs
 
     soup = BeautifulSoup(body, 'html.parser')
     for d in soup.find_all(custom_selector): recurs_del(d) # remove custom_selector items
-
     texts = soup.get_text().strip()
     texts = texts.replace('\r', '').split('\n') # remove \r, organize by \n
     texts = list(filter(str.strip, texts)) # remove empty and whitespace items

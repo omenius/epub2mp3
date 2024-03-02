@@ -5,7 +5,7 @@ from TTS.tts.layers.xtts.tokenizer import get_spacy_lang
 
 def split_sentence(text, language):
     limit = 250
-    hard_limit = 1200
+    hard_limit = 600
     """Preprocess the input text"""
     text_splits = []
     if len(text) >= limit:
@@ -20,7 +20,7 @@ def split_sentence(text, language):
                 text_splits[-1] += " " + str(sentence)
                 text_splits[-1] = text_splits[-1].lstrip()
             elif len(str(sentence)) > hard_limit:
-                print('hard limit broken: \n'+sentence)
+                print('!!! hard limit broken: \n'+str(sentence))
                 # if the current sentence is greater than the hard_limit
                 for line in textwrap.wrap(
                     str(sentence),
